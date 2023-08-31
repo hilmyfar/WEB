@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--manggil css-->
+    <link rel="stylesheet" href="mappage.css" />
+    <!--Script Leaflet buat Map-->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+      integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
+      crossorigin=""
+    />
+    <!--manggil custom panel-->
+    <link rel="stylesheet" href="leaflet-panel-layers.css" />
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script
+      src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+      integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
+      crossorigin=""
+    ></script>
+    <!--manggil panel extended leaflet-->
+    <script src="https://opengeo.tech/maps/leaflet-panel-layers/dist/leaflet-panel-layers.src.js"></script>
+    <!--manggil data shapefile/json-->
+    <script src="Lin/Lin1.js"></script>
+    <script src="Lin/Lin2.js"></script>
+    <script src="Lin/Lin3.js"></script>
+    <script src="Lin/Lin4.js"></script>
+    <script src="Network Analysis/Jangkauan_Halte_WGS84.js"></script>
+    <script src="Halte/rpr_Halte Transit_Lin 1-2.js"></script>
+    <script src="Halte/rpr_Halte Transit_Lin 1-4.js"></script>
+    <script src="Halte/rpr_Halte Transit_Lin 2-4.js"></script>
+    <script src="Halte/rpr_Halte_Lin 1.js"></script>
+    <script src="Halte/rpr_Halte_Lin 2.js"></script>
+    <script src="Halte/rpr_Halte_Lin 3.js"></script>
+    <script src="Halte/rpr_Halte_Lin 4.js"></script>
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="map"></div>
+  </body>
+  <script>
+    //basemap
+    var map = L.map("map").setView([-7.276075, 112.7199532], 12);
+
+    var osm = new L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    });
+
+    var GoogleMaps = new L.tileLayer("https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", {
+      opacity: 1.0,
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">Google Maps</a>',
+    }).addTo(map);
+
+    googleSat = L.tileLayer("http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}", {
+      maxZoom: 20,
+      subdomains: ["mt0", "mt1", "mt2", "mt3"],
+    });
+
+    // Carto Dark
+    var carto_dark = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: "abcd",
+      maxZoom: 20,
+    });
+
+    //Komponen/legenda Line
+    var Lin1_style = {
+      color: "#ff0004",
+      weight: 3,
+      opacity: 1,
+    };
+    var Lin1 = L.geoJSON(Lin1, {
+      style: Lin1_style,
+    }).bindPopup(function (layer) {
+      return layer.feature.properties.Name;
+    });
+
+    var Lin2_style = {
+      color: "#2b00ff",
+      weight: 3,
+      opacity: 1,
+    };
+    var Lin2 = L.geoJSON(Lin2, {
+      style: Lin2_style,
+    }).bindPopup(function (layer) {
+      return layer.feature.properties.Name;
+    });
+
+    var Lin3_style = {
+      color: "#ffae00",
+      weight: 3,
+      opacity: 1,
+    };
+    var Lin3 = L.geoJSON(Lin3, {
+      style: Lin3_style,
+    }).bindPopup(function (layer) {
+      return layer.feature.properties.Name;
+    });
+
+    var Lin4_style = {
+      color: "#ff00f2",
+      weight: 3,
+      opacity: 1,
+    };
+    var Lin4 = L.geoJSON(Lin4, {
+      style: Lin4_style,
+    }).bindPopup(function (layer) {
+      return layer.feature.properties.Name;
+    });
+
+    //point Halte
+    var hl_icon = L.icon({
+      iconUrl: "Halte/halte.png",
+      iconSize: [15, 15],
+    });
+    var ht_icon = L.icon({
+      iconUrl: "Halte/haltetransfer.png",
+      iconSize: [20, 20],
+    });
+
+    //halte transfer
+    var halte_T12 = L.geoJSON(ht_12, {
+      pointToLayer: function (feature, latlng) {
+        var marker = L.marker(latlng, { icon: ht_icon });
+        marker.bindPopup(feature.properties.descript_1);
+        return marker;
+      },
+    });
+    var halte_T14 = L.geoJSON(ht_14, {
+      pointToLayer: function (feature, latlng) {
+        var marker = L.marker(latlng, { icon: ht_icon });
+        marker.bindPopup(feature.properties.descript_1);
+        return marker;
+      },
+    });
+    var halte_T24 = L.geoJSON(ht_24, {
+      pointToLayer: function (feature, latlng) {
+        var marker = L.marker(latlng, { icon: ht_icon });
+        marker.bindPopup(feature.properties.descript_1);
+        return marker;
+      },
+    });
+    //halte langsung
+    var halte_L1 = L.geoJSON(hl_1, {
+      pointToLayer: function (feature, latlng) {
+        var marker = L.marker(latlng, { icon: hl_icon });
+        marker.bindPopup(feature.properties.Name);
+        return marker;
+      },
+    });
+    var halte_L2 = L.geoJSON(hl_2, {
+      pointToLayer: function (feature, latlng) {
+        var marker = L.marker(latlng, { icon: hl_icon });
+        marker.bindPopup(feature.properties.Name);
+        return marker;
+      },
+    });
+    var halte_L3 = L.geoJSON(hl_3, {
+      pointToLayer: function (feature, latlng) {
+        var marker = L.marker(latlng, { icon: hl_icon });
+        marker.bindPopup(feature.properties.Name);
+        return marker;
+      },
+    });
+    var halte_L4 = L.geoJSON(hl_4, {
+      pointToLayer: function (feature, latlng) {
+        var marker = L.marker(latlng, { icon: hl_icon });
+        marker.bindPopup(feature.properties.Name);
+        return marker;
+      },
+    });
+
+    //polygon
+    var service_area = L.geoJson(NA_halte, {
+      style: function (feature) {
+        var fillColor,
+          kode = feature.properties.Total_Lin;
+        if (kode == "1") fillColor = "#ffff00";
+        else if (kode == "2") fillColor = "#44ff26";
+        else if (kode == "3") fillColor = "#2bba4f";
+        else fillColor = "#f7f7f7"; // no data
+        return { color: "#999", weight: 0.1, fillColor: fillColor, fillOpacity: 0.7 };
+      },
+      onEachFeature: function (feature, layer) {
+        layer.bindPopup(feature.properties.Area_Lin);
+      },
+    });
+    //overlay
+    // var list_lin = {
+    //  "Lin 1 R1 & R2 (Purabaya-Rajawali)": Lin1,
+    //"Lin 2 TB-II (Lidah Wetan-Kejawan Putih Tambak)": Lin2,
+    //"Lin K3L (MERR)": Lin3,
+    //"Lin 4 R7 & R8 (TIJ Joyoboyo-PTC Lenmark)": Lin4,
+    //};
+    //var list_halte = {
+    //"Halte Lin 1 R1&R2": halte_L1,
+    //"Halte Lin 2 TB-II": halte_L2,
+    //"Halte K3L MERR": halte_L3,
+    //"Halte Lin 4 R7&R8": halte_L4,
+    //"Halte Transfer Lin 1 dan 2": halte_T12,
+    //"Halte Transfer Lin 1 dan 4": halte_T14,
+    //"Halte Transfer Lin 2 dan 4": halte_T24,
+    //};
+
+    //var network_analysis = {
+    //"Area 15 menit berjalan kaki (<1.2km dari Halte)": service_area,
+    //};
+
+    // var baseMaps = {
+    //  "Google Maps": GoogleMaps,
+    // "Google Satelite": googleSat,
+    // "OpenStreet Maps": osm,
+    // "Carto Dark": carto_dark,
+    // };
+
+    //leaflet panel layers
+
+    var baseLayers = [
+      {
+        group: "Peta Latar",
+        collapsed: true,
+        layers: [
+          {
+            name: "Google Maps",
+            layer: GoogleMaps,
+          },
+          {
+            name: "Google Satellite",
+            layer: googleSat,
+          },
+          {
+            name: "Carto Dark",
+            layer: carto_dark,
+          },
+        ],
+      },
+    ];
+    var overLayers = [
+      {
+        group: "Area dengan Aksesibilitas Berjalan Kaki",
+        collapsed: true,
+        layers: [
+          {
+            active: true,
+            name: "Banyaknya Lin yang terjangkau dalam suatu area",
+            layer: service_area,
+          },
+        ],
+      },
+      {
+        group: "Rute/Lin",
+        collapsed: false,
+        layers: [
+          {
+            active: true,
+            name: "Lin 1 R1 & R2 (Purabaya-Rajawali)",
+            layer: Lin1,
+          },
+          {
+            active: true,
+            name: "Lin 2 TB-II (Lidah Wetan-Kejawan Putih Tambak)",
+            layer: Lin2,
+          },
+          {
+            active: true,
+            name: "Lin K3L (MERR)",
+            layer: Lin3,
+          },
+          {
+            active: true,
+            name: "Lin 4 R7 & R8 (TIJ Joyoboyo-PTC Lenmark)",
+            layer: Lin4,
+          },
+        ],
+      },
+      {
+        group: "Halte",
+        collapsed: false,
+        layers: [
+          {
+            active: false,
+            name: "Halte Lin 1 R1&R2",
+            layer: halte_L1,
+          },
+          {
+            active: false,
+            name: "Halte Lin 2 TB-II",
+            layer: halte_L2,
+          },
+          {
+            active: false,
+            name: "Halte Lin K3L MERR",
+            layer: halte_L3,
+          },
+          {
+            active: false,
+            name: "Halte Lin 4 R7&R8",
+            layer: halte_L4,
+          },
+          {
+            active: false,
+            name: "Halte Transfer Lin 1 dan 2",
+            layer: halte_T12,
+          },
+          {
+            active: false,
+            name: "Halte Transfer Lin 1 dan 4",
+            layer: halte_T14,
+          },
+          {
+            active: false,
+            name: "Halte Transfer Lin 2 dan 4",
+            layer: halte_T24,
+          },
+        ],
+      },
+    ];
+
+    var panelLayers = new L.Control.PanelLayers(baseLayers, overLayers, {
+      title:
+        "<h3>Peta Aksesibilitas TransSemanggi-SuroboyoBus</h3><p>Aksesibilitas berjalan diukur dengan menganalisis area <br>yang dapat dijangkau dalam <15 menit atau <1.2 km<br>dari halte terdekat menggunakan Network Analysis.</p><p>Laman dan analisis dibuat oleh <a href='https://www.github.com/hilmyfar'> Hilmy Farras</a><br><a href='https://www.google.com/maps/d/u/0/viewer?mid=1vIuyfh-Fwj-48oe3wE2PFh34tSPnJZFS&hl=en_US&ll=-7.277209142377289%2C112.70481274999999&z=12'>Stops and Routes Data</a> oleh Ilham Perkasa</p><br>",
+      compact: true,
+      collapsed: false,
+      groupCheckboxes: true,
+      selectorGroup: true,
+      collapsibleGroups: true,
+    });
+
+    map.addControl(panelLayers);
+
+    /*Legend specific*/
+    var legend = L.control({ position: "bottomleft" });
+
+    legend.onAdd = function (map) {
+      var div = L.DomUtil.create("div", "legend");
+      div.innerHTML += "<h4>Tingkat aksesibilitas</h4>";
+      div.innerHTML += '<i style="background: #2bba4f"></i><span>Area dilayani 3 Lin Bus</span><br>';
+      div.innerHTML += '<i style="background: #44ff26"></i><span>Area dilayani 2 Lin Bus</span><br>';
+      div.innerHTML += '<i style="background: #ffff00"></i><span>Area dilayani 1 Lin Bus</span><br>';
+      div.innerHTML +=
+        '<i class="icon" style="background-image: url(Halte/halte.png);background-repeat: no-repeat;"></i><span>Halte</span><br>';
+      div.innerHTML +=
+        '<i class="icon" style="background-image: url(Halte/haltetransfer.png);background-repeat: no-repeat;"></i><span>Halte Transfer</span><br>';
+
+      return div;
+    };
+
+    legend.addTo(map);
+  </script>
+</html>
